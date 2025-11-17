@@ -2,7 +2,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="text-center">Sign In</h3>
+                <h3 class="text-center">Login</h3>
             </div>
             <div class="card-body">
                 <!-- Display error message if any -->
@@ -20,7 +20,7 @@
                 <% } %>
 
                 <!-- CÁCH 1: Form submission truyền thống -->
-                <form action="/auth/signin" method="POST">
+                <form action="/auth/login" method="POST">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email address</label>
                         <input type="email" class="form-control" id="email" name="email" required>
@@ -30,29 +30,29 @@
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Sign In</button>
+                        <button type="submit" class="btn btn-primary">Login</button>
                     </div>
                 </form>
 
                 <!-- CÁCH 2: Nếu muốn dùng fetch (uncomment phần này và comment phần trên) -->
                 <!--
-                <form id="signinForm">
+                <form id="loginForm">
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <label for="email2" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email2" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <label for="password2" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password2" name="password" required>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Sign In</button>
+                        <button type="submit" class="btn btn-primary">Login</button>
                     </div>
                 </form>
                 -->
 
                 <div class="text-center mt-3">
-                    <p>Don't have an account? <a href="/auth/register">Sign up here</a></p>
+                    <p>Don't have an account? <a href="/auth/register">Register here</a></p>
                 </div>
             </div>
         </div>
@@ -62,7 +62,7 @@
 <!-- Script cho cách 2 (fetch) - comment lại nếu dùng cách 1 -->
 <!--
 <script>
-document.getElementById('signinForm').addEventListener('submit', async function(e) {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const formData = new FormData(this);
@@ -72,7 +72,7 @@ document.getElementById('signinForm').addEventListener('submit', async function(
     };
     
     try {
-        const response = await fetch('/api/login', {
+        const response = await fetch('/auth/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

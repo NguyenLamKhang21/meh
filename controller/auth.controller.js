@@ -12,7 +12,7 @@ module.exports = {
     });
   },
 
-  // Handle login form submission
+  // Handle login form submission (EJS Form)
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -44,13 +44,11 @@ module.exports = {
         }
       );
 
-      // Set token in cookie or session
+      // Set token in cookie
       res.cookie("token", token, { httpOnly: true, maxAge: 3600000 }); // 1 hour
-
-      res.json({
-        message: "Login successful",
-        token: token,
-      });
+      
+      // Redirect to home page after successful login
+      res.redirect('/');
     } catch (error) {
       res.render("auth/login", {
         title: "Login",
@@ -60,48 +58,44 @@ module.exports = {
     }
   },
 
-  // Render register page
-  showRegister: (req, res) => {
-    res.render("auth/register", {
-      title: "Register",
-      error: null,
-      success: null,
-    });
-  },
-
-  // Handle register form submission
-  register: async (req, res) => {
+  //Api login
+  signin: async (req, res) => {
     try {
-      const { email, password, name } = req.body;
+      const { email, password } = req.body;
 
       const user = await db.User.findOne({ email });
-      if (user) {
-        return res.render("auth/register", {
-          title: "Register",
-          error: "User already exists",
-          success: null,
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+          success: false
         });
       }
 
-      const hashedPassword = await bcryptjs.hash(password, 10);
-      const newUser = new db.User({
-        email,
-        password: hashedPassword,
-        name,
-      });
+      const isPasswordValid = await bcryptjs.compare(password, user.password);
 
-      await newUser.save();
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          message: "Invalid password",
+          success: false
+        });
+      }
 
-      res.render("auth/login", {
-        title: "Login",
-        error: null,
-        success: "Registration successful! Please login.",
+      const token = jwt.sign(
+        { userId: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+
+      res.status(200).json({
+        message: "Login successful",
+        token: token,
       });
     } catch (error) {
-      res.render("auth/register", {
-        title: "Register",
-        error: error.message,
-        success: null,
+      res.status(500).json({
+        message: error.message,
+        success: false
       });
     }
   },
