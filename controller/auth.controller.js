@@ -15,7 +15,7 @@ module.exports = {
   // Handle login form submission (EJS Form)
   login: async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, key } = req.body;
 
       const user = await db.User.findOne({ email });
       if (!user) {
@@ -26,7 +26,7 @@ module.exports = {
         });
       }
 
-      const isPasswordValid = await bcryptjs.compare(password, user.password);
+      const isPasswordValid = await bcryptjs.compare(key, user.key);
 
       if (!isPasswordValid) {
         return res.render("auth/login", {
@@ -36,19 +36,15 @@ module.exports = {
         });
       }
 
-      const token = jwt.sign(
-        { userId: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1h",
-        }
-      );
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
 
       // Set token in cookie
       res.cookie("token", token, { httpOnly: true, maxAge: 3600000 }); // 1 hour
-      
+
       // Redirect to home page after successful login
-      res.redirect('/');
+      res.redirect("/");
     } catch (error) {
       res.render("auth/login", {
         title: "Login",
@@ -61,32 +57,28 @@ module.exports = {
   //Api login
   signin: async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { name, key } = req.body;
 
-      const user = await db.User.findOne({ email });
+      const user = await db.User.findOne({ name });
       if (!user) {
         return res.status(404).json({
           message: "User not found",
-          success: false
+          success: false,
         });
       }
 
-      const isPasswordValid = await bcryptjs.compare(password, user.password);
+      const isPasswordValid = await bcryptjs.compare(key, user.key);
 
       if (!isPasswordValid) {
         return res.status(401).json({
           message: "Invalid password",
-          success: false
+          success: false,
         });
       }
 
-      const token = jwt.sign(
-        { userId: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1h",
-        }
-      );
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
 
       res.status(200).json({
         message: "Login successful",
@@ -95,7 +87,7 @@ module.exports = {
     } catch (error) {
       res.status(500).json({
         message: error.message,
-        success: false
+        success: false,
       });
     }
   },
